@@ -1,6 +1,4 @@
-// Fake REST API (localStorage). Har function ek REST endpoint ki tarah hai.
-// Real backend lagana ho to inhe fetch("/api/...") se replace kar dein.
-const KEY = "fo_db_v2"; // v2: naye restaurants load karne ke liye key badli
+const KEY = "fo_db_v2";
 const wait = (data) => new Promise((r) => setTimeout(() => r(structuredClone(data)), 250));
 const fail = (msg) => new Promise((_, rej) => setTimeout(() => rej(new Error(msg)), 250));
 const uid = () => Math.random().toString(36).slice(2, 9);
@@ -74,14 +72,12 @@ export async function login({ email, password }) {
   return wait(safe);
 }
 
-// ---- Restaurants & Menu ----
 export const getRestaurants = (q = "") =>
   wait(load().restaurants.filter((r) => (r.name + r.cuisine).toLowerCase().includes(q.toLowerCase())));
 export const getRestaurant = (id) => wait(load().restaurants.find((r) => r.id === id));
 export const getItems = (restaurantId, q = "") =>
   wait(load().items.filter((i) => (!restaurantId || i.restaurantId === restaurantId) && (i.name + i.category).toLowerCase().includes(q.toLowerCase())));
 
-// ---- Admin: menu CRUD ----
 export async function saveItem(item) {
   const db = load();
   if (item.id) db.items = db.items.map((i) => (i.id === item.id ? { ...i, ...item } : i));
@@ -92,7 +88,6 @@ export async function deleteItem(id) {
   const db = load(); db.items = db.items.filter((i) => i.id !== id); save(db); return wait(true);
 }
 
-// ---- Orders ----
 export async function placeOrder({ userId, userName, items, total, address, phone }) {
   const db = load();
   const order = { id: uid().toUpperCase(), userId, userName, items, total, address, phone, status: "Placed", createdAt: new Date().toISOString() };
